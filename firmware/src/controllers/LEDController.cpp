@@ -20,7 +20,7 @@ unsigned long LEDController::toNeoColor(unsigned long color) {
 
 void LEDController::begin() {
   pinMode(Config::PIN_LED_LS, OUTPUT);
-  digitalWrite(Config::PIN_LED_LS, LOW);
+  digitalWrite(Config::PIN_LED_LS, Config::SWITCH_LOW);
 
   ring_.begin();
   ring_.setBrightness(Config::LED_BRIGHTNESS);
@@ -33,7 +33,7 @@ void LEDController::setPower(bool enabled) {
   }
 
   isPowered_ = enabled;
-  digitalWrite(Config::PIN_LED_LS, enabled ? HIGH : LOW);
+  digitalWrite(Config::PIN_LED_LS, enabled ? Config::SWITCH_HIGH : Config::SWITCH_LOW);
   delay(10);
   
 }

@@ -15,6 +15,12 @@ const int PIN_MAG1_LS = D10;
 const int PIN_MAG2_LS = D9;
 const int PIN_MAG3_LS = D8;
 
+
+// If using AP22816BKEWT-7 instead of AP22816AKEWT-7, as specified in the BOM
+// the output to the switches needs to be inverted.
+const bool SWITCH_HIGH = LOW;
+const bool SWITCH_LOW = HIGH;
+
 // Samples for calibration offset
 const int ZERO_SAMPLES = 200;
 
