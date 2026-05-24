@@ -10,6 +10,7 @@ void CalibratingState::enter() {
   sensorController.beginCalibration();
   motionController.reset();
   ledController.startSpinner(Config::LED_CALIBRATING_COLOR);
+  startTimeMS = millis();
 }
 
 void CalibratingState::update() {
@@ -19,6 +20,12 @@ void CalibratingState::update() {
 
   if (sensorController.calibrationDone()) {
     stateMachine.changeState(&StateMachine::idleState);
+    return;
+  }
+
+
+  if(millis() - startTimeMS >= Config::CALIBRATION_TIMEOUT_MS){
+    stateMachine.changeState(&StateMachine::calibrationFailureState);
   }
 }
 

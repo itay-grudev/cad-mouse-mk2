@@ -101,6 +101,11 @@ void SensorController::beginCalibration() {
   }
 }
 
+void SensorController::stopCalibration() {
+  calibrationActive_ = false;
+  calibrationDone_ = false;
+}
+
 void SensorController::updateCalibration() {
   if (!calibrationActive_) {
     return;

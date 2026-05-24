@@ -24,7 +24,6 @@ void LEDController::begin() {
   digitalWrite(Config::PIN_LED_LS, Config::SWITCH_LOW);
 
   ring_.begin();
-  ring_.setBrightness(Config::LED_BRIGHTNESS);
   ring_.show();
 }
 
@@ -50,8 +49,6 @@ void LEDController::setSolid(unsigned long color) {
 void LEDController::startSpinner(unsigned long color) {
   mode_ = Mode::Spinner;
   color_ = toNeoColor(color);
-  spinnerIndex_ = 0;
-  lastSpinnerStepMs_ = 0;
   setPower(true);
 }
 
@@ -97,6 +94,35 @@ void LEDController::updateSpinner() {
     ring_.setPixelColor(i, ring_.Color(r, g, b));
   }
 
+  ring_.show();
+}
+
+void LEDController::startBlink(unsigned long color, uint8_t blinkCount){
+  mode_ = Mode::Blink;
+  color_ = toNeoColor(color);
+  remainingBlinks_ = blinkCount;
+  setPower(true);
+}
+
+void LEDController::updateBlink() {
+  if (mode_ != Mode::Blink) {
+    return;
+  }
+
+  const uint16_t blinkIntervalMs = 1500;
+
+  if( lastBlinkStartedAt_ == 0 || millis() - lastBlinkStartedAt_ >= blinkIntervalMs ){
+    --remainingBlinks_;
+   
+    if (remainingBlinks_ == 255)
+      return off(); 
+
+    lastBlinkStartedAt_ = millis();
+  }
+
+  float brightness = sinf((static_cast<float>(max(millis() - lastBlinkStartedAt_, 1)) / blinkIntervalMs) * PI) * 100;
+  fillAll(color_);
+  ring_.setBrightness(brightness);
   ring_.show();
 }
 

@@ -50,9 +50,13 @@ const float AXIS_LIMIT = 350.0;
 
 // RGB LEDs
 const int LED_COUNT = 8;
-const int LED_BRIGHTNESS = 40;
 const unsigned long LED_IDLE_COLOR = 0x00FF00;
 const unsigned long LED_CALIBRATING_COLOR = 0x0000FF;
+const unsigned long LED_ERROR_COLOR = 0xFF0000;
+
+// Calibration timeout period.  Display LED_ERROR_COLOR on LED ring if
+// the calibration fails.
+const unsigned long CALIBRATION_TIMEOUT_MS = 5000;
 
 // FSM timing
 const long IDLE_SLEEP_TIMEOUT_MS = 2 * 60 * 1000;

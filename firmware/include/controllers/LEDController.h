@@ -9,13 +9,16 @@ class LEDController {
   void begin();
   void setSolid(unsigned long color);
   void startSpinner(unsigned long color);
+  void startBlink(unsigned long color, uint8_t blinkCount);
   void updateSpinner();
+  void updateBlink();
   void off();
 
  private:
   enum class Mode {
     Off,
     Solid,
+    Blink,
     Spinner,
   };
 
@@ -26,7 +29,7 @@ class LEDController {
   bool isPowered_ = false;
   Mode mode_ = Mode::Off;
   unsigned long color_ = 0;
-  int spinnerIndex_ = 0;
-  unsigned long lastSpinnerStepMs_ = 0;
+  uint8_t remainingBlinks_ = 0;
+  unsigned long lastBlinkStartedAt_ = 0;
   Adafruit_NeoPixel ring_;
 };

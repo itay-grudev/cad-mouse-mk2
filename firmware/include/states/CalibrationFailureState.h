@@ -2,12 +2,9 @@
 
 #include "State.h"
 
-class CalibratingState : public State {
+class CalibrationFailureState : public State {
  public:
   void enter() override;
   void update() override;
   void exit() override;
-
-private:
-  unsigned long startTimeMS = 0;
 };
