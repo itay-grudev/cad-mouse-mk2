@@ -54,9 +54,11 @@ const unsigned long LED_IDLE_COLOR = 0x00FF00;
 const unsigned long LED_CALIBRATING_COLOR = 0x0000FF;
 const unsigned long LED_ERROR_COLOR = 0xFF0000;
 
-// Calibration timeout period.  Display LED_ERROR_COLOR on LED ring if
-// the calibration fails.
+// Calibration timeout period.
 const unsigned long CALIBRATION_TIMEOUT_MS = 5000;
+
+// Minimum movement on any axis to wake up from sleep mode, in sensor units.
+const float SLEEP_KNOB_DEVIATION_THRESHOLD = 3.0;
 
 // FSM timing
 const long IDLE_SLEEP_TIMEOUT_MS = 2 * 60 * 1000;
