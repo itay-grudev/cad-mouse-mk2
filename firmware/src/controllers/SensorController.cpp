@@ -37,19 +37,19 @@ void SensorController::begin() {
 
   powerOn(Config::PIN_MAG1_LS);
   mag1Sensor_.begin(true, false, false, true);
-  mag1Sensor_.setIICAddress(TLx493D_IIC_ADDR_A2_e);
+  mag1Sensor_.setIICAddress(TLx493D_IIC_ADDR_A1_e);
   mag1Sensor_.setSensitivity(TLx493D_EXTRA_SHORT_RANGE_e);
   delay(10);
 
   powerOn(Config::PIN_MAG2_LS);
   mag2Sensor_.begin(true, false, false, true);
-  mag2Sensor_.setIICAddress(TLx493D_IIC_ADDR_A1_e);
+  mag2Sensor_.setIICAddress(TLx493D_IIC_ADDR_A2_e);
   mag2Sensor_.setSensitivity(TLx493D_EXTRA_SHORT_RANGE_e);
   delay(10);
 
   powerOn(Config::PIN_MAG3_LS);
   mag3Sensor_.begin(true, false, false, true);
-  mag2Sensor_.setIICAddress(TLx493D_IIC_ADDR_A0_e);
+  mag3Sensor_.setIICAddress(TLx493D_IIC_ADDR_A3_e);
   mag3Sensor_.setSensitivity(TLx493D_EXTRA_SHORT_RANGE_e);
   delay(10);
 }
