@@ -28,14 +28,17 @@ void LEDController::begin() {
 }
 
 void LEDController::setPower(bool enabled) {
-  if (enabled == isPowered_) {
+  if (enabled == isPowered_)
     return;
-  }
 
   isPowered_ = enabled;
-  digitalWrite(Config::PIN_LED_LS, enabled ? Config::SWITCH_HIGH : Config::SWITCH_LOW);
-  delay(10);
-  
+
+  if(enabled){
+    ring_.setBrightness(255);
+    digitalWrite(Config::PIN_LED_LS, Config::SWITCH_HIGH);
+  } else {
+    digitalWrite(Config::PIN_LED_LS, Config::SWITCH_LOW);
+  }
 }
 
 void LEDController::setSolid(unsigned long color) {
