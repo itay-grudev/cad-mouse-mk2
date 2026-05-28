@@ -38,7 +38,7 @@ const float DEAD_R = 20.0;
 const float KALMAN_Q = 0.5;
 // Measurement noise: how noisy the sensor readings are.
 // Higher = smoother but more latency.
-const float KALMAN_R = 4.0;
+const float KALMAN_R = 5.0;
 
 // Sensitivity curve exponent.
 // 1.0 = linear, 3.0 = cubic (fine control at small deflections, fast at large).
@@ -57,7 +57,7 @@ const unsigned long LED_ERROR_COLOR = 0xFF0000;
 const unsigned long CALIBRATION_TIMEOUT_MS = 5000;
 
 // Minimum movement on any axis to wake up from sleep mode, in sensor units.
-const float SLEEP_KNOB_DEVIATION_THRESHOLD = 3.0;
+const float SLEEP_KNOB_DEVIATION_THRESHOLD = 5.0;
 
 // FSM timing
 const long IDLE_SLEEP_TIMEOUT_MS = 2 * 60 * 1000;
