@@ -5,31 +5,36 @@
 
 class LEDController {
  public:
-  LEDController();
-  void begin();
-  void setSolid(unsigned long color);
-  void startSpinner(unsigned long color);
-  void startBlink(unsigned long color, uint8_t blinkCount);
-  void updateSpinner();
-  void updateBlink();
-  void off();
-
- private:
   enum class Mode {
     Off,
     Solid,
     Blink,
+    FadeIn,
+    FadeOut,
     Spinner,
   };
 
-  void setPower(bool enabled);
-  void fillAll(unsigned long color);
-  unsigned long toNeoColor(unsigned long color);
+  LEDController();
+  void begin();
+  void solid(uint32_t color);
+  void spinner(uint32_t color);
+  void blink(uint32_t color, uint8_t blinkCount, uint16_t animationPeriod = 1500);
+  void fadeIn(uint32_t color, uint16_t durationMs = 750);
+  void fadeOut(uint16_t durationMs = 750);
+  void update();
+  void off();
+  Mode mode() const { return mode_; }
 
-  bool isPowered_ = false;
+ private:
+
+  inline void updateSpinner();
+  inline void updateBlink();
+  inline void updateFade();
+
   Mode mode_ = Mode::Off;
-  unsigned long color_ = 0;
+  uint32_t color_ = 0;
   uint8_t remainingBlinks_ = 0;
-  unsigned long lastBlinkStartedAt_ = 0;
+  uint32_t animationStartedAt_ = 0;
+  uint16_t animationPeriod_ = 1500;
   Adafruit_NeoPixel ring_;
 };

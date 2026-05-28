@@ -9,13 +9,13 @@
 void CalibratingState::enter() {
   sensorController.beginCalibration();
   motionController.reset();
-  ledController.startSpinner(Config::LED_CALIBRATING_COLOR);
+  ledController.spinner(Config::LED_CALIBRATING_COLOR);
   startTimeMS = millis();
 }
 
 void CalibratingState::update() {
   inputController.update();
-  ledController.updateSpinner();
+  ledController.update();
   sensorController.updateCalibration();
 
   if (sensorController.calibrationDone()) {

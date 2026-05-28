@@ -9,7 +9,7 @@
 void IdleState::enter() {
   lastUpdateMs_ = 0;
   lastActivityMs_ = millis();
-  ledController.setSolid(Config::LED_IDLE_COLOR);
+  ledController.fadeIn(Config::LED_IDLE_COLOR);
 }
 
 bool IdleState::handleCalibrationRequest() {
@@ -49,6 +49,7 @@ void IdleState::handleSleepTransition(unsigned long now) {
 
 void IdleState::update() {
   inputController.update();
+  ledController.update();
 
   if (handleCalibrationRequest()) {
     return;

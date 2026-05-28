@@ -8,7 +8,7 @@
 
 void CalibrationFailureState::enter() {
   sensorController.stopCalibration();
-  ledController.startBlink(Config::LED_ERROR_COLOR, 2);
+  ledController.blink(Config::LED_ERROR_COLOR, 2);
 }
 
 void CalibrationFailureState::update() {
@@ -17,7 +17,7 @@ void CalibrationFailureState::update() {
   if (inputController.takeCalibrationRequest())
     return stateMachine.changeState(&StateMachine::calibratingState);
 
-  ledController.updateBlink();
+  ledController.update();
 }
 
 void CalibrationFailureState::exit() {}

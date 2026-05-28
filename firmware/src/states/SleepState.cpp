@@ -7,11 +7,12 @@
 #include "StateMachine.h"
 
 void SleepState::enter() {
-  ledController.off();
+  ledController.fadeOut();
 }
 
 void SleepState::update() {
   inputController.update();
+  ledController.update();
 
   if (inputController.takeActivity())
     return stateMachine.changeState(&StateMachine::idleState);
@@ -22,7 +23,7 @@ void SleepState::update() {
     return;
   }
   const float* baseline = sensorController.baseline();
-  for (int i = 0; i < 9; i++) {
+  for (int i = 0; i < 9; ++i) {
     if (fabsf(raw[i] - baseline[i]) > Config::SLEEP_KNOB_DEVIATION_THRESHOLD)
       return stateMachine.changeState(&StateMachine::idleState);
   }

@@ -26,6 +26,8 @@ void setup() {
   motionController.reset();
   telemetryController.begin();
 
+  delay(1); // Ensure everything is up before starting calibration
+
   stateMachine.changeState(&StateMachine::calibratingState);
 }
 

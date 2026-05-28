@@ -2,67 +2,64 @@
 #include "Config.h"
 #include <math.h>
 
+inline void fillAll(Adafruit_NeoPixel& ring, uint32_t color) {
+  for (int i = 0; i < ring.numPixels(); ++i) {
+    ring.setPixelColor(i, color);
+  }
+}
+
 LEDController::LEDController()
     : ring_(Config::LED_COUNT, Config::PIN_LED_DATA,
             NEO_GRB + NEO_KHZ800) {}
 
-void LEDController::fillAll(unsigned long color) {
-  for (int i = 0; i < ring_.numPixels(); i++) {
-    ring_.setPixelColor(i, color);
-  }
-}
-
-unsigned long LEDController::toNeoColor(unsigned long color) {
-  int r = (color >> 16) & 0xFF;
-  int g = (color >> 8) & 0xFF;
-  int b = color & 0xFF;
-  return ring_.Color(r, g, b);
-}
-
 void LEDController::begin() {
   pinMode(Config::PIN_LED_LS, OUTPUT);
-  digitalWrite(Config::PIN_LED_LS, LOW != Config::USE_INVERTED_SWITCHES);
-
+  digitalWrite(Config::PIN_LED_LS, HIGH != Config::USE_INVERTED_SWITCHES);
   ring_.begin();
+}
+
+void LEDController::off() {
+  mode_ = Mode::Off;
+  ring_.clear();
   ring_.show();
 }
 
-void LEDController::setPower(bool enabled) {
-  if (enabled == isPowered_)
-    return;
-
-  isPowered_ = enabled;
-
-  if(enabled){
-    ring_.setBrightness(255);
-    digitalWrite(Config::PIN_LED_LS, HIGH != Config::USE_INVERTED_SWITCHES);
-  } else {
-    digitalWrite(Config::PIN_LED_LS, LOW != Config::USE_INVERTED_SWITCHES);
-  }
-}
-
-void LEDController::setSolid(unsigned long color) {
+void LEDController::solid(uint32_t color) {
   mode_ = Mode::Solid;
-  color_ = toNeoColor(color);
-  setPower(true);
-  fillAll(color_);
+  color_ = color;
+  fillAll(ring_, color_);
   ring_.show();
 }
 
-void LEDController::startSpinner(unsigned long color) {
+void LEDController::spinner(uint32_t color) {
   mode_ = Mode::Spinner;
-  color_ = toNeoColor(color);
-  setPower(true);
+  color_ = color;
+  ring_.setBrightness(255);
 }
 
-void LEDController::updateSpinner() {
-  if (mode_ != Mode::Spinner) {
-    return;
-  }
+void LEDController::update() {
+  switch (mode_) {
+  case Mode::Solid:
+    break;
+  case Mode::Blink:
+    updateBlink();
+    break;
+  case Mode::Spinner:
+    updateSpinner();
+    break;
+  case Mode::FadeIn:
+  case Mode::FadeOut:
+    updateFade();
+    break;
+  case Mode::Off:
+  default:
+    break;
+  } 
+}
 
-  const unsigned long now = millis();
+inline void LEDController::updateSpinner() {
+  const uint32_t now = millis();
 
-  fillAll(0);
   const int pixelCount = ring_.numPixels();
   if (pixelCount <= 0) {
     return;
@@ -81,7 +78,7 @@ void LEDController::updateSpinner() {
   // In LED units: 1 lights nearest two strongly, >1 adds a soft tail.
   const float falloffWidth = 1.0f;
 
-  for (int i = 0; i < pixelCount; i++) {
+  for (int i = 0; i < pixelCount; ++i) {
     float distance = fabsf(static_cast<float>(i) - idealPosition);
     distance = fminf(distance, static_cast<float>(pixelCount) - distance);
 
@@ -100,38 +97,55 @@ void LEDController::updateSpinner() {
   ring_.show();
 }
 
-void LEDController::startBlink(unsigned long color, uint8_t blinkCount){
+void LEDController::blink(uint32_t color, uint8_t blinkCount, uint16_t animationPeriod){
   mode_ = Mode::Blink;
-  color_ = toNeoColor(color);
+  color_ = color;
   remainingBlinks_ = blinkCount;
-  setPower(true);
+  ring_.setBrightness(255);
+  animationStartedAt_ = 0;
+  animationPeriod_ = animationPeriod;
 }
 
-void LEDController::updateBlink() {
-  if (mode_ != Mode::Blink) {
-    return;
-  }
-
-  const uint16_t blinkIntervalMs = 1500;
-
-  if( lastBlinkStartedAt_ == 0 || millis() - lastBlinkStartedAt_ >= blinkIntervalMs ){
+inline void LEDController::updateBlink() {
+  if( animationStartedAt_ == 0 || millis() - animationStartedAt_ >= animationPeriod_ ){
     --remainingBlinks_;
    
     if (remainingBlinks_ == 255)
       return off(); 
 
-    lastBlinkStartedAt_ = millis();
+    animationStartedAt_ = millis();
   }
 
-  float brightness = sinf((static_cast<float>(max(millis() - lastBlinkStartedAt_, 1)) / blinkIntervalMs) * PI) * 100;
-  fillAll(color_);
+  float brightness = sinf((static_cast<float>(max(millis() - animationStartedAt_, 1)) / animationPeriod_) * PI) * 100;
+  fillAll(ring_, color_);
   ring_.setBrightness(brightness);
   ring_.show();
 }
 
-void LEDController::off() {
-  mode_ = Mode::Off;
-  fillAll(0);
+void LEDController::fadeIn(uint32_t color, uint16_t durationMs) {
+  mode_ = Mode::FadeIn;
+  color_ = color;
+  animationStartedAt_ = millis();
+  animationPeriod_ = durationMs;
+}
+
+void LEDController::fadeOut(uint16_t durationMs) {
+  mode_ = Mode::FadeOut;
+  animationStartedAt_ = millis();
+  animationPeriod_ = durationMs;
+}
+
+inline void LEDController::updateFade() {
+  const float progress = static_cast<float>(millis() - animationStartedAt_) / animationPeriod_;
+  if (progress >= 1.0f) {
+    if (mode_ == Mode::FadeIn)
+      return solid(color_);
+    else
+      return off();
+  }
+
+  float brightness = (mode_ == Mode::FadeIn) ? (progress * 100) : ((1.0f - progress) * 100);
+  fillAll(ring_, color_);
+  ring_.setBrightness(brightness);
   ring_.show();
-  setPower(false);
 }
